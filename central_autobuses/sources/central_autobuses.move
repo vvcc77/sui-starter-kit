@@ -20,6 +20,7 @@ module central_autobuses::central_autobuses {
 
     #[error]
     const NUMERO_NO_VALIDO: vector<u8> = b"Numero de autobus ya existente, intenta con otro";
+    #[error]
     const AUTOBUS_NO_ENCONTRADO: u16 = 404;
 
     public fun crear_central(nombre: String, ctx: &mut TxContext) {
@@ -37,7 +38,7 @@ module central_autobuses::central_autobuses {
     public fun agregar_ruta(central: &mut Central, chofer: String, ruta: String, numero:u8) {
 
         assert!(!central.autobuses.contains(&numero), NUMERO_NO_VALIDO);
-
+        
         let autobus = Autobus {
             chofer,
             ruta,
@@ -53,22 +54,20 @@ module central_autobuses::central_autobuses {
         
         assert!(central.autobuses.contains(&numero), AUTOBUS_NO_ENCONTRADO);
 
-        let cantidad_pasajeros = central.autobuses.get_mut(&numero).pasajeros;
-        cantidad_pasajeros = pasajeros;
+        let autobus = central.autobuses.get_mut(&numero);
+        autobus.pasajeros = pasajeros;
 
-        let estado_autobus = central.autobuses.get_mut(&numero).estado;
-        estado_autobus = utf8(b"En viaje");
+        autobus.estado = utf8(b"En viaje");
     }
 
     public fun llegada_autobus(central: &mut Central, numero: u8) {
         
         assert!(central.autobuses.contains(&numero), AUTOBUS_NO_ENCONTRADO);
 
-        let cantidad_pasajeros = central.autobuses.get_mut(&numero).pasajeros;
-        cantidad_pasajeros = 0u8;
+        let autobus = central.autobuses.get_mut(&numero);
+        autobus.pasajeros = 0u8;
 
-        let estado_autobus = central.autobuses.get_mut(&numero).estado;
-        estado_autobus = utf8(b"En central");
+        autobus.estado = utf8(b"En central");
     }
 
     public fun borrar_ruta(central: &mut Central, numero: u8) {
@@ -77,5 +76,5 @@ module central_autobuses::central_autobuses {
         central.autobuses.remove(&numero);
     }
 
-    
+
 }
